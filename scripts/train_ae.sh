@@ -1,16 +1,16 @@
-# # CelebAMaskHQ training
-# python main/train_ae.py +dataset=celebamaskhq128/train \
-#                      dataset.vae.data.root='/data1/kushagrap20/datasets/CelebAMask-HQ/' \
-#                      dataset.vae.data.name='celebamaskhq' \
-#                      dataset.vae.data.hflip=True \
-#                      dataset.vae.training.batch_size=42 \
-#                      dataset.vae.training.log_step=50 \
-#                      dataset.vae.training.epochs=500 \
-#                      dataset.vae.training.device=\'gpu:0,1,3\' \
-#                      dataset.vae.training.results_dir=\'/data1/kushagrap20/vae_cmhq128_alpha=1.0/\' \
-#                      dataset.vae.training.workers=2 \
-#                      dataset.vae.training.chkpt_prefix=\'cmhq128_alpha=1.0\' \
-#                      dataset.vae.training.alpha=1.0
+ # CelebAMaskHQ training
+ python main/train_ae.py +dataset=celebamaskhq128/train \
+                      dataset.vae.data.root='/root/workspace/skku/DGM/DiffuseVAE/CelebAMask-HQ/' \
+                      dataset.vae.data.name='celebamaskhq' \
+                      dataset.vae.data.hflip=True \
+                      dataset.vae.training.batch_size=42 \
+                      dataset.vae.training.log_step=50 \
+                      dataset.vae.training.epochs=500 \
+                      dataset.vae.training.device=\'gpu:0,1,2\' \
+                      dataset.vae.training.results_dir=\'/root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/\' \
+                      dataset.vae.training.workers=2 \
+                      dataset.vae.training.chkpt_prefix=\'cmhq128_alpha=1.0\' \
+                      dataset.vae.training.alpha=1.0
 
 # # FFHQ 128 training
 # python main/train_ae.py +dataset=ffhq/train \

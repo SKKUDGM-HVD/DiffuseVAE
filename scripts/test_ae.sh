@@ -1,28 +1,28 @@
-# python main/test.py reconstruct --device gpu:0 \
+# python main/test.py reconstruct --device cuda:0 \
 #                                 --dataset celeba \
 #                                 --image-size 64 \
 #                                 --save-path ~/vae_celeba64_recons/ \
 #                                 --write-mode numpy \
-#                                 ~/vae_celeba64_alpha\=1.0/checkpoints/vae-celeba64_alpha\=1.0-epoch\=245-train_loss\=0.0000.ckpt \
-#                                 ~/datasets/img_align_celeba/
+#                                 /root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/checkpoints/test.ckpt \
+#                                 /root/workspace/sharing/lgp-mlu-dev/share/img-align-celeba/img-align-celeba/test
 
-# python main/test.py reconstruct --device gpu:0 \
-#                                 --dataset ffhq \
-#                                 --image-size 128 \
-#                                 --num-samples 64 \
-#                                 --save-path ~/vae_samples_ffhq128_deletem_recons/ \
-#                                 --write-mode image \
-#                                 /data1/kushagrap20/vae_ffhq128_11thJune_alpha\=1.0/checkpoints/vae-ffhq128_11thJune_alpha\=1.0-epoch\=496-train_loss\=0.0000.ckpt \
-#                                 ~/datasets/ffhq/
+ python main/test.py reconstruct --device cuda:0 \
+                                 --dataset ffhq \
+                                 --image-size 128 \
+                                 --num-samples 64 \
+                                 --save-path /root/workspace/skku/DGM/DiffuseVAE/result/ \
+                                 --write-mode image \
+                                 /root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/checkpoints/test.ckpt \
+                                 /root/workspace/sharing/lgp-mlu-dev/share/ffhq
 
-# python main/test.py sample --device gpu:0 \
+#python main/test.py sample --device cuda:0 \
 #                             --image-size 32 \
 #                             --seed 0 \
 #                             --num-samples 50000 \
-#                             --save-path ~/vae_samples_cifar10_deleteme/ \
+#                             --save-path /root/workspace/skku/DGM/DiffuseVAE/result/vae_samples_cifar10_deleteme/ \
 #                             --write-mode image \
 #                             512 \
-#                             /data1/kushagrap20/checkpoints/cifar10/vae-cifar10-epoch=500-train_loss=0.00.ckpt \
+#                             /root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/checkpoints/test.ckpt \
 
 # python main/test.py sample --device gpu:0 \
 #                             --image-size 128 \

@@ -101,7 +101,7 @@ def generate_recons(config):
         guidance_weight=config_ddpm.evaluation.guidance_weight,
         z_cond=config_ddpm.evaluation.z_cond,
         ddpm_latents=ddpm_latents,
-        strict=True,
+        strict=False,
     )
 
     # Dataset

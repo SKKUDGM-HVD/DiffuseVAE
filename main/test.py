@@ -87,7 +87,7 @@ def reconstruct(
     save_path=os.getcwd(),
     write_mode="image",
 ):
-    dev, _ = configure_device(device)
+    dev = configure_device(device)
     if num_samples == 0:
         raise ValueError(f"`--num-samples` can take value=-1 or > 0")
 
@@ -166,7 +166,7 @@ def sample(
     write_mode="image",
 ):
     seed_everything(seed)
-    dev, _ = configure_device(device)
+    dev = configure_device(device)
     if num_samples <= 0:
         raise ValueError(f"`--num-samples` can take values > 0")
 
