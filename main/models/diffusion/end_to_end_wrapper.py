@@ -139,3 +139,113 @@ class E2EDDPMWrapper(pl.LightningModule):
                 "strict": False,
             },
         }
+    
+    def predict_step(self, batch, batch_idx, dataloader_idx=None):
+        if not self.conditional:
+            if self.guidance_weight != 0.0:
+                raise ValueError(
+                    "Guidance weight cannot be non-zero when using unconditional DDPM"
+                )
+            x_t = batch
+            return self(
+                x_t,
+                cond=None,
+                z=None,
+                n_steps=self.pred_steps,
+                checkpoints=self.pred_checkpoints,
+                ddpm_latents=None,
+            )
+
+        if self.eval_mode == "sample":
+            x_t, z = batch
+            recons = self.vae(z)
+            recons = 2 * recons - 1
+
+            # Initial temperature scaling
+            x_t = x_t * self.temp
+
+            # Formulation-2 initial latent
+            if isinstance(self.online_network, DDPMv2):
+                x_t = recons + self.temp * torch.randn_like(recons)
+        else:
+            img = batch
+            recons = self.vae.forward_recons(img * 0.5 + 0.5)
+            recons = 2 * recons - 1
+
+            # DDPM encoder
+            x_t = self.online_network.compute_noisy_input(
+                img,
+                torch.randn_like(img),
+                torch.tensor(
+                    [self.online_network.T - 1] * img.size(0), device=img.device
+                ),
+            )
+
+            if isinstance(self.online_network, DDPMv2):
+                x_t += recons
+
+        return (
+            self(
+                x_t,
+                cond=recons,
+                z=z.squeeze() if self.z_cond else None,
+                n_steps=self.pred_steps,
+                checkpoints=self.pred_checkpoints,
+                ddpm_latents=self.ddpm_latents,
+            ),
+            recons,
+        )
+    
+    def forward(
+        self,
+        x,
+        cond=None,
+        z=None,
+        n_steps=None,
+        ddpm_latents=None,
+        checkpoints=[],
+    ):
+        sample_nw = (
+            self.target_network if self.sample_from == "target" else self.online_network
+        )
+        spaced_nw = (
+            SpacedDiffusionForm2
+            if isinstance(self.online_network, DDPMv2)
+            else SpacedDiffusion
+        )
+        # For spaced resampling
+        if self.resample_strategy == "spaced":
+            num_steps = n_steps if n_steps is not None else self.online_network.T
+            indices = space_timesteps(sample_nw.T, num_steps, type=self.skip_strategy)
+            if self.spaced_diffusion is None:
+                self.spaced_diffusion = spaced_nw(sample_nw, indices).to(x.device)
+
+            if self.sample_method == "ddim":
+                return self.spaced_diffusion.ddim_sample(
+                    x,
+                    cond=cond,
+                    z_vae=z,
+                    guidance_weight=self.guidance_weight,
+                    checkpoints=checkpoints,
+                )
+            return self.spaced_diffusion(
+                x,
+                cond=cond,
+                z_vae=z,
+                guidance_weight=self.guidance_weight,
+                checkpoints=checkpoints,
+                ddpm_latents=ddpm_latents,
+            )
+
+        # For truncated resampling
+        if self.sample_method == "ddim":
+            raise ValueError("DDIM is only supported for spaced sampling")
+        return sample_nw.sample(
+            x,
+            cond=cond,
+            z_vae=z,
+            n_steps=n_steps,
+            guidance_weight=self.guidance_weight,
+            checkpoints=checkpoints,
+            ddpm_latents=ddpm_latents,
+        )
