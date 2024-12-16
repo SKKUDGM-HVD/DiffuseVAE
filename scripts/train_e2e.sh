@@ -12,7 +12,7 @@ python main/train_e2e.py +dataset=celeba64/train \
                       dataset.ddpm.training.type='form1' \
                       dataset.ddpm.training.cfd_rate=0.0 \
                       dataset.ddpm.training.epochs=500 \
-                      dataset.ddpm.training.z_cond=False \
+                      dataset.ddpm.training.z_cond=Ture \
                       dataset.ddpm.training.log_step=50 \
                       dataset.ddpm.training.batch_size=32 \
                       dataset.ddpm.training.vae_chkpt_path=\'/root/workspace/skku/DGM/DiffuseVAE/vae_celeba64_alpha=1.0/checkpoints/test.ckpt\' \
