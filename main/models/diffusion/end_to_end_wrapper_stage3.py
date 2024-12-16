@@ -7,7 +7,7 @@ from models.diffusion.ddpm_form2 import DDPMv2
 from util import space_timesteps
 
 
-class E2EDDPMWrapper(pl.LightningModule):
+class E2EDDPMWrapper_stage3(pl.LightningModule):
     def __init__(
         self,
         online_network,
@@ -96,12 +96,12 @@ class E2EDDPMWrapper(pl.LightningModule):
         )
 
         # Sample noise
-        # Variance Conditional noise
         if self.conditional:
-            var_mean = logvar.exp().mean(dim=1, keepdim=True)
-            eps = torch.randn_like(x) * var_mean
+            logvar_mean = logvar.exp().mean(dim=1, keepdim=True)  # Shape: [4, 1, 1, 1]
+            eps = torch.randn_like(x) * logvar_mean
         else:
             eps = torch.randn_like(x)
+        #eps = torch.randn_like(x)
 
         # Predict noise
         eps_pred = self.online_network(
