@@ -96,7 +96,12 @@ class E2EDDPMWrapper(pl.LightningModule):
         )
 
         # Sample noise
-        eps = torch.randn_like(x)
+        # Variance Conditional noise
+        if self.conditional:
+            var_mean = logvar.exp().mean(dim=1, keepdim=True)
+            eps = torch.randn_like(x) * var_mean
+        else:
+            eps = torch.randn_like(x)
 
         # Predict noise
         eps_pred = self.online_network(
