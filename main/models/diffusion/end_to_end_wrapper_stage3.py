@@ -193,7 +193,7 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
             self(
                 x_t,
                 cond=recons,
-                z=z.squeeze() if self.z_cond else None,
+                z=None,
                 n_steps=self.pred_steps,
                 checkpoints=self.pred_checkpoints,
                 ddpm_latents=self.ddpm_latents,
