@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from util import configure_device, get_dataset
 from models.vae import VAE
-
+import matplotlib.pyplot as plt
 
 @click.group()
 def cli():
@@ -29,9 +29,8 @@ def extract(
     image_size=32,
     save_path=os.getcwd(),
 ):
-    # dev, _ = configure_device(device)
-    dev = 'cuda'
-
+    dev = "cuda"
+    
     # Dataset
     dataset = get_dataset(dataset_name, root, image_size, norm=False, flip=False)
 
@@ -60,11 +59,22 @@ def extract(
         z_list.append(z.cpu())
 
     cat_z = torch.cat(z_list, dim=0)
-
     # Save the latents as numpy array
     os.makedirs(save_path, exist_ok=True)
     np.save(os.path.join(save_path, f"latents_{dataset_name}.npy"), cat_z.numpy())
 
+    # Batch-wise decoding to handle large datasets
+    batch_size = 64
+    for i in range(0, cat_z.size(0), batch_size):
+        batch_z = cat_z[i:i+batch_size].to(dev)
+        with torch.no_grad():
+            generated_images = vae.decode(batch_z).cpu().numpy()
+
+        # 생성된 이미지를 시각화 및 저장
+        num_images = min(10, generated_images.shape[0])  # 처음 10개 이미지를 저장
+        for j in range(num_images):
+            img = generated_images[j].transpose(1, 2, 0)  # 채널을 마지막으로 이동
+            plt.imsave(os.path.join(save_path, f"generated_image_{i+j}.png"), img)
 
 if __name__ == "__main__":
     cli()

@@ -20,18 +20,20 @@ def fit_gmm(
     save_path=os.getcwd(),
     n_components=10,
 ):
+    print("test1")
     # Load latents
     z = np.load(latent_path).squeeze()
-
+    print("test2")
     # Fit a GMM model
     gmm = GaussianMixture(
         n_components=n_components, random_state=0, verbose=2, verbose_interval=1
     )
     gmm.fit(z)
-
+    print("test3")
     # Save the sklearn model on disk
     os.makedirs(save_path, exist_ok=True)
     s = dump(gmm, os.path.join(save_path, f"gmm_{n_components}.joblib"))
+    print("test4")
 
 
 if __name__ == "__main__":
