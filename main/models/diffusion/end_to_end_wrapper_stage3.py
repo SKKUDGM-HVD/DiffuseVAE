@@ -108,12 +108,18 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
             x, eps, t, low_res=cond, z=z.squeeze() if self.z_cond else None
         )
 
-        # Compute loss
-        loss = self.criterion(eps, eps_pred)
+        # Compute DDPM loss
+        ddpm_loss = self.criterion(eps, eps_pred)
+
+        # Compute VAE loss using VAE's compute_loss method
+        vae_loss, recons_loss, kl_loss = self.vae.compute_loss(batch)
+
+        # Combine losses
+        total_loss = ddpm_loss + vae_loss
 
         # Clip gradients and Optimize
         optim.zero_grad()
-        self.manual_backward(loss)
+        self.manual_backward(total_loss)
         torch.nn.utils.clip_grad_norm_(
             self.online_network.decoder.parameters(), self.grad_clip_val
         )
@@ -121,8 +127,10 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
 
         # Scheduler step
         lr_sched.step()
-        self.log("loss", loss, prog_bar=True)
-        return loss
+        self.log("loss", total_loss, prog_bar=True)
+        self.log("VAE Recons Loss", recons_loss, prog_bar=True)
+        self.log("VAE KL Loss", kl_loss, prog_bar=True)
+        return total_loss
 
     def configure_optimizers(self):
         # VAE와 DDPM의 파라미터를 모두 포함하는 옵티마이저
