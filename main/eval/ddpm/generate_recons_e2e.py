@@ -107,6 +107,7 @@ def generate_recons(config):
         ddpm_latents=ddpm_latents,
         strict=False,
     )
+    ddpm_wrapper.vae.eval()
 
     # Dataset
     root = config_ddpm.data.root

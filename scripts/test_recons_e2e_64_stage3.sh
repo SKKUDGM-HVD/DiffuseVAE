@@ -13,7 +13,7 @@ python main/eval/ddpm/generate_recons_e2e_stage3.py +dataset=celeba64/test \
                          dataset.ddpm.evaluation.sample_prefix='gpu_0' \
                          dataset.ddpm.evaluation.device=\'gpu:0\' \
                          dataset.ddpm.evaluation.save_mode='image' \
-                         dataset.ddpm.evaluation.chkpt_path=\'/root/workspace/skku/DGM/DiffuseVAE/diffusevae_celeba64_e2e_nheads=8_dropout=0.1/checkpoints/test.ckpt\' \
+                         dataset.ddpm.evaluation.chkpt_path=\'/root/workspace/skku/DGM/DiffuseVAE/diffusevae_celeba64_e2e_st3_nheads=8_dropout=0.1/checkpoints/test.ckpt\' \
                          dataset.ddpm.evaluation.type='form1' \
                          dataset.ddpm.evaluation.resample_strategy='spaced' \
                          dataset.ddpm.evaluation.skip_strategy='quad' \
@@ -21,7 +21,7 @@ python main/eval/ddpm/generate_recons_e2e_stage3.py +dataset=celeba64/test \
                          dataset.ddpm.evaluation.sample_from='target' \
                          dataset.ddpm.evaluation.temp=1.0 \
                          dataset.ddpm.evaluation.batch_size=4 \
-                         dataset.ddpm.evaluation.save_path=\'/root/workspace/skku/DGM/DiffuseVAE/e2e_64/\' \
+                         dataset.ddpm.evaluation.save_path=\'/root/workspace/skku/DGM/DiffuseVAE/e2e_stg3_64/\' \
                          dataset.ddpm.evaluation.z_cond=True \
                          dataset.ddpm.evaluation.n_samples=100 \
                          dataset.ddpm.evaluation.n_steps=100 \

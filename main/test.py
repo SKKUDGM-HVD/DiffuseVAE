@@ -166,7 +166,7 @@ def sample(
     write_mode="image",
 ):
     seed_everything(seed)
-    dev = configure_device(device)
+    dev = "cuda:0"
     if num_samples <= 0:
         raise ValueError(f"`--num-samples` can take values > 0")
 
