@@ -23,34 +23,34 @@
 #                         dataset.ddpm.evaluation.workers=1
 
 
-# python main/eval/ddpm/sample_cond.py +dataset=celebamaskhq128/test \
-#                         dataset.ddpm.data.norm=True \
-#                         dataset.ddpm.model.attn_resolutions=\'16,\' \
-#                         dataset.ddpm.model.dropout=0.1 \
-#                         dataset.ddpm.model.n_residual=2 \
-#                         dataset.ddpm.model.dim_mults=\'1,2,2,3,4\' \
-#                         dataset.ddpm.model.n_heads=8 \
-#                         dataset.ddpm.evaluation.guidance_weight=0.0 \
-#                         dataset.ddpm.evaluation.seed=0 \
-#                         dataset.ddpm.evaluation.sample_prefix='gpu_0' \
-#                         dataset.ddpm.evaluation.device=\'gpu:0\' \
-#                         dataset.ddpm.evaluation.save_mode='image' \
-#                         dataset.ddpm.evaluation.chkpt_path=\'/data1/kushagrap20/diffusevae_rework/celebahq128/ddpmv2-cmhq128_rework_form2_7thJuly_sota_nheads=8_dropout=0.1-epoch=999-loss=0.0032.ckpt\' \
-#                         dataset.ddpm.evaluation.type='form2' \
-#                         dataset.ddpm.evaluation.resample_strategy='spaced' \
-#                         dataset.ddpm.evaluation.skip_strategy='quad' \
-#                         dataset.ddpm.evaluation.sample_method='ddim' \
-#                         dataset.ddpm.evaluation.sample_from='target' \
-#                         dataset.ddpm.evaluation.temp=1.0 \
-#                         dataset.ddpm.evaluation.batch_size=16 \
-#                         dataset.ddpm.evaluation.save_path=\'/data1/kushagrap20/ddpm_cmhq_confirm_form2/\' \
-#                         dataset.ddpm.evaluation.z_cond=False \
-#                         dataset.ddpm.evaluation.n_samples=2500 \
-#                         dataset.ddpm.evaluation.n_steps=50 \
-#                         dataset.ddpm.evaluation.save_vae=True \
-#                         dataset.ddpm.evaluation.workers=1 \
-#                         dataset.vae.evaluation.chkpt_path=\'/data1/kushagrap20/diffusevae_rework/celebahq128/vae-cmhq128_alpha=1.0-epoch=499-train_loss=0.0000.ckpt\' \
-#                         dataset.vae.evaluation.expde_model_path=\'/data1/kushagrap20/cmhq128_latents/gmm_z/gmm_100.joblib\'
+python main/eval/ddpm/sample_cond.py +dataset=celebamaskhq128/test \
+                         dataset.ddpm.data.norm=True \
+                         dataset.ddpm.model.attn_resolutions=\'16,\' \
+                         dataset.ddpm.model.dropout=0.1 \
+                         dataset.ddpm.model.n_residual=2 \
+                         dataset.ddpm.model.dim_mults=\'1,2,2,3,4\' \
+                         dataset.ddpm.model.n_heads=8 \
+                         dataset.ddpm.evaluation.guidance_weight=0.0 \
+                         dataset.ddpm.evaluation.seed=0 \
+                         dataset.ddpm.evaluation.sample_prefix='gpu_0' \
+                         dataset.ddpm.evaluation.device=\'gpu:0\' \
+                         dataset.ddpm.evaluation.save_mode='image' \
+                         dataset.ddpm.evaluation.chkpt_path=\'/root/workspace/skku/DGM/DiffuseVAE/diffusevae_celebahq128_rework_form1__21stJune_sota_nheads=8_dropout=0.1/checkpointsddpm_v2.ckpt\' \
+                         dataset.ddpm.evaluation.type='form2' \
+                         dataset.ddpm.evaluation.resample_strategy='spaced' \
+                         dataset.ddpm.evaluation.skip_strategy='quad' \
+                         dataset.ddpm.evaluation.sample_method='ddim' \
+                         dataset.ddpm.evaluation.sample_from='target' \
+                         dataset.ddpm.evaluation.temp=1.0 \
+                         dataset.ddpm.evaluation.batch_size=16 \
+                         dataset.ddpm.evaluation.save_path=\'/root/workspace/skku/DGM/DiffuseVAE/ddpm_result/\' \
+                         dataset.ddpm.evaluation.z_cond=False \
+                         dataset.ddpm.evaluation.n_samples=2500 \
+                         dataset.ddpm.evaluation.n_steps=50 \
+                         dataset.ddpm.evaluation.save_vae=True \
+                         dataset.ddpm.evaluation.workers=1 \
+                         dataset.vae.evaluation.chkpt_path=\'/root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/checkpoints/test.ckpt\' \
+                         dataset.vae.evaluation.expde_model_path=\'/data1/kushagrap20/cmhq128_latents/gmm_z/gmm_100.joblib\'
 
 
 # python main/eval/ddpm/sample.py +dataset=cifar10/test \

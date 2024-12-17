@@ -1,15 +1,15 @@
  # CelebAMaskHQ training
- python main/train_ae.py +dataset=celebamaskhq128/train \
-                      dataset.vae.data.root='/root/workspace/skku/DGM/DiffuseVAE/CelebAMask-HQ/' \
-                      dataset.vae.data.name='celebamaskhq' \
+ python main/train_ae.py +dataset=celeba64/train \
+                      dataset.vae.data.root='/root/workspace/sharing/lgp-mlu-dev/share/celaba64/50k' \
+                      dataset.vae.data.name='celeba' \
                       dataset.vae.data.hflip=True \
-                      dataset.vae.training.batch_size=42 \
+                      dataset.vae.training.batch_size=32 \
                       dataset.vae.training.log_step=50 \
-                      dataset.vae.training.epochs=500 \
+                      dataset.vae.training.epochs=1500 \
                       dataset.vae.training.device=\'gpu:0,1,2\' \
-                      dataset.vae.training.results_dir=\'/root/workspace/skku/DGM/DiffuseVAE/result/vae_cmhq128_alpha=1.0/\' \
-                      dataset.vae.training.workers=2 \
-                      dataset.vae.training.chkpt_prefix=\'cmhq128_alpha=1.0\' \
+                      dataset.vae.training.results_dir=\'/root/workspace/skku/DGM/DiffuseVAE/vae_celeba64_alpha=1.0/\' \
+                      dataset.vae.training.workers=4 \
+                      dataset.vae.training.chkpt_prefix=\'celeba64_alpha=1.0\' \
                       dataset.vae.training.alpha=1.0
 
 # # FFHQ 128 training

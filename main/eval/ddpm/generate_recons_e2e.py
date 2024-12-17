@@ -13,6 +13,7 @@ import pytorch_lightning as pl
 import torch
 from models.callbacks import ImageWriter
 from models.diffusion import DDPM, DDPMv2, DDPMWrapper, SuperResModel
+from models.diffusion import E2EDDPMWrapper
 from models.vae import VAE
 from pytorch_lightning.utilities.seed import seed_everything
 from torch.utils.data import DataLoader
@@ -38,13 +39,6 @@ def generate_recons(config):
     image_size = config_ddpm.data.image_size
     ddpm_latent_path = config_ddpm.data.ddpm_latent_path
     ddpm_latents = torch.load(ddpm_latent_path) if ddpm_latent_path != "" else None
-
-    # Load pretrained VAE
-    vae = VAE.load_from_checkpoint(
-        config_vae.evaluation.chkpt_path,
-        input_res=image_size,
-    )
-    vae.eval()
 
     # Load pretrained wrapper
     attn_resolutions = __parse_str(config_ddpm.model.attn_resolutions)
@@ -83,8 +77,18 @@ def generate_recons(config):
         T=config_ddpm.model.n_timesteps,
         var_type=config_ddpm.evaluation.variance,
     )
+    
+    vae = VAE(
+        input_res=image_size,
+        enc_block_str=config_ddpm.model.enc_block_config,
+        dec_block_str=config_ddpm.model.dec_block_config,
+        enc_channel_str=config_ddpm.model.enc_channel_config,
+        dec_channel_str=config_ddpm.model.dec_channel_config,
+        lr=config_ddpm.model.lr,
+        alpha=config_ddpm.model.alpha,
+    )
 
-    ddpm_wrapper = DDPMWrapper.load_from_checkpoint(
+    ddpm_wrapper = E2EDDPMWrapper.load_from_checkpoint(
         config_ddpm.evaluation.chkpt_path,
         online_network=online_ddpm,
         target_network=target_ddpm,
