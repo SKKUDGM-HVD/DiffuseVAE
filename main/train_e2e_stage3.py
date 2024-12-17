@@ -96,7 +96,7 @@ def train(config):
     )
 
     for p in vae.parameters():
-        p.requires_grad = False
+        p.requires_grad = True
 
     assert isinstance(online_ddpm, ddpm_cls)
     assert isinstance(target_ddpm, ddpm_cls)

@@ -240,6 +240,24 @@ class VAE(pl.LightningModule):
         decoder_out = self.decode(z)
         return decoder_out
 
+    def compute_loss(self, x):
+        # Encoder
+        mu, logvar = self.encode(x)
+
+        # Reparameterization Trick
+        z = self.reparameterize(mu, logvar)
+
+        # Decoder
+        decoder_out = self.decode(z)
+
+        # Compute loss
+        mse_loss = nn.MSELoss(reduction="sum")
+        recons_loss = mse_loss(decoder_out, x)
+        kl_loss = self.compute_kl(mu, logvar)
+
+        total_loss = recons_loss + self.alpha * kl_loss
+        return total_loss, recons_loss, kl_loss
+    
     def training_step(self, batch, batch_idx):
         x = batch
 
