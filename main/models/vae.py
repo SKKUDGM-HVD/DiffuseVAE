@@ -241,21 +241,18 @@ class VAE(pl.LightningModule):
         return decoder_out
 
     def compute_loss(self, x):
-        # Encoder
+        # Forward pass through VAE
         mu, logvar = self.encode(x)
-
-        # Reparameterization Trick
         z = self.reparameterize(mu, logvar)
-
-        # Decoder
         decoder_out = self.decode(z)
 
-        # Compute loss
         mse_loss = nn.MSELoss(reduction="sum")
         recons_loss = mse_loss(decoder_out, x)
+        
+        beta = 0.01  # 초기에는 작은 값으로 시작
         kl_loss = self.compute_kl(mu, logvar)
+        total_loss = recons_loss + 0.01 * kl_loss
 
-        total_loss = recons_loss + self.alpha * kl_loss
         return total_loss, recons_loss, kl_loss
     
     def training_step(self, batch, batch_idx):
@@ -274,10 +271,9 @@ class VAE(pl.LightningModule):
         mse_loss = nn.MSELoss(reduction="sum")
         recons_loss = mse_loss(decoder_out, x)
         kl_loss = self.compute_kl(mu, logvar)
+        total_loss = recons_loss + self.alpha * kl_loss
         self.log("Recons Loss", recons_loss, prog_bar=True)
         self.log("Kl Loss", kl_loss, prog_bar=True)
-
-        total_loss = recons_loss + self.alpha * kl_loss
         self.log("Total Loss", total_loss)
         return total_loss
 

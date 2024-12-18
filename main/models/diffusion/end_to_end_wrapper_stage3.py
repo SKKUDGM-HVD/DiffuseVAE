@@ -71,8 +71,10 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         # Optimizers
-        optim = self.optimizers()
-        lr_sched = self.lr_schedulers()
+        optim_ddpm, optim_vae = self.optimizers()  # 두 개의 옵티마이저
+
+        # Scheduler
+        lr_sched_ddpm, lr_sched_vae = self.lr_schedulers()
 
         cond = None
         z = None
@@ -108,50 +110,59 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
             x, eps, t, low_res=cond, z=z.squeeze() if self.z_cond else None
         )
 
-        # Compute DDPM loss
+        # DDPM 손실 계산
         ddpm_loss = self.criterion(eps, eps_pred)
+        ddpm_loss = ddpm_loss.mean()  # 스칼라로 축소
 
-        # Compute VAE loss using VAE's compute_loss method
-        vae_loss, recons_loss, kl_loss = self.vae.compute_loss(batch)
+        # VAE 손실 계산
+        decoder_out = cond
+        mse_loss = nn.MSELoss(reduction="mean")  # 스칼라로 축소
+        recons_loss = mse_loss(decoder_out, x)
+        kl_loss = self.vae.compute_kl(mu, logvar).mean()  # 스칼라로 축소
+        vae_loss = recons_loss + self.vae.alpha * kl_loss
 
-        # Combine losses
-        total_loss = ddpm_loss + vae_loss
+        # DDPM 최적화
+        optim_ddpm.zero_grad()
+        self.manual_backward(ddpm_loss, retain_graph=True)
+        torch.nn.utils.clip_grad_norm_(self.online_network.parameters(), self.grad_clip_val)
+        optim_ddpm.step()
 
-        # Clip gradients and Optimize
-        optim.zero_grad()
-        self.manual_backward(total_loss)
-        torch.nn.utils.clip_grad_norm_(
-            self.online_network.decoder.parameters(), self.grad_clip_val
-        )
-        optim.step()
+        # VAE 최적화
+        optim_vae.zero_grad()
+        self.manual_backward(vae_loss)
+        torch.nn.utils.clip_grad_norm_(self.vae.parameters(), self.grad_clip_val)
+        optim_vae.step()
 
-        # Scheduler step
-        lr_sched.step()
-        self.log("loss", total_loss, prog_bar=True)
+        # 스케줄러 단계
+        lr_sched_ddpm.step()
+        lr_sched_vae.step()
+
+        # 손실 로그
+        self.log("DDPM Loss", ddpm_loss, prog_bar=True)
         self.log("VAE Recons Loss", recons_loss, prog_bar=True)
         self.log("VAE KL Loss", kl_loss, prog_bar=True)
-        return total_loss
+        return ddpm_loss + vae_loss
 
     def configure_optimizers(self):
-        # VAE와 DDPM의 파라미터를 모두 포함하는 옵티마이저
-        optimizer = torch.optim.Adam(
-            list(self.online_network.parameters()) + list(self.vae.parameters()), lr=self.lr
-        )
+        # DDPM 옵티마이저
+        optimizer_ddpm = torch.optim.Adam(self.online_network.parameters(), lr=self.lr)
+
+        # VAE 옵티마이저
+        optimizer_vae = torch.optim.Adam(self.vae.parameters(), lr=self.lr)
 
         # 학습률 스케줄러 정의
         if self.n_anneal_steps == 0:
             lr_lambda = lambda step: 1.0
         else:
             lr_lambda = lambda step: min(step / self.n_anneal_steps, 1.0)
-        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda)
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {
-                "scheduler": scheduler,
-                "interval": "step",
-                "strict": False,
-            },
-        }
+
+        scheduler_ddpm = torch.optim.lr_scheduler.LambdaLR(optimizer_ddpm, lr_lambda)
+        scheduler_vae = torch.optim.lr_scheduler.LambdaLR(optimizer_vae, lr_lambda)
+
+        return [
+            {"optimizer": optimizer_ddpm, "lr_scheduler": {"scheduler": scheduler_ddpm, "interval": "step", "strict": False}},
+            {"optimizer": optimizer_vae, "lr_scheduler": {"scheduler": scheduler_vae, "interval": "step", "strict": False}}
+        ]
     
     def predict_step(self, batch, batch_idx, dataloader_idx=None):
         if not self.conditional:
@@ -201,7 +212,7 @@ class E2EDDPMWrapper_stage3(pl.LightningModule):
             self(
                 x_t,
                 cond=recons,
-                z=None,
+                z=z.squeeze() if self.z_cond else None,
                 n_steps=self.pred_steps,
                 checkpoints=self.pred_checkpoints,
                 ddpm_latents=self.ddpm_latents,
